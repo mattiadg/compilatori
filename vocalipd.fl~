@@ -1,0 +1,99 @@
+//Se una parola ha un numero pari di vocali, tutte le vocali vengono trasformate in 'a' e tutte le consonanti in maiuscolo.
+//Se lo vocali sono in numero dispari, ogni vocale viene trasformata nella successiva, le consonanti doppie dimezzate e le altre in maiuscolo
+
+%option main
+%x PARI DISPARI
+
+vocale			[aeiouAEIOU]
+consonante		[b-df-hl-np-tv-zB-DF-HL-NP-TV-Z]
+
+%{
+ 	#include <ctype.h>
+	char nextvowel(char);
+	char* doublecon(char* pair);
+%}
+
+%%
+
+/({consonante}*{vocale}{consonante}*{vocale}{consonante}*)*				    	 { BEGIN(PARI); }
+/{consonante}*{vocale}({consonante}*{vocale}{consonante}*{vocale}{consonante}*)* { BEGIN(DISPARI); }
+<PARI>{vocale}																	 { printf("a"); }
+<PARI>{consonante}																 { printf("%c", toupper(yytext[0])); }
+<PARI>[ \t\n]																	 { ECHO; BEGIN(INITIAL); }
+<DISPARI>{vocale}																 { printf("%c", nextvowel(yytext[0])); }
+<DISPARI>{consonante}{consonante}												 { printf("%s", doublecon(yytext)); }
+<DISPARI>{consonante}															 { printf("%c", toupper(yytext[0])); }
+<DISPARI>[ \t\n]																 { ECHO; BEGIN(INITIAL); }
+.																				 { ECHO; }
+\n																				 { ECHO; }
+
+%%
+
+char nextvowel(char ch){
+	int val;
+	int min = (ch>='a'&&ch<='z')?1:0;
+	char vocm[] = ['a', 'e', 'i', 'o', 'u'];
+	char vocM[] = ['A', 'E', 'I', 'O', 'U'];
+	switch(ch){
+		case 'a': val = 1; break;
+		case 'e': val = 2; break;
+		case 'i': val = 3; break;
+		case 'o': val = 4; break;
+		case 'u': val = 5; break;
+		case 'A': val = 1; break;
+		case 'E': val = 2; break;
+		case 'I': val = 3; break;
+		case 'O': val = 4; break;
+		case 'U': val = 5; break;
+	}
+	if(min)
+		return vocm[(val+1)%5];
+	else
+		return vocM[(val+1)%5];
+}
+
+char* doublecon(char* pair){
+	if(pair[0] == pair[1])
+		pair[1] = '\0';
+	else{
+		pair[0] = toupper(pair[0]);
+		pair[1] = toupper(pair[1]);
+	}
+	return pair;
+}
+/*
+int isvowel(char ch){
+	if(ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' ||ch == 'u')
+		return 1;
+	else if(ch == 'A' || ch == 'E' || ch == 'I' || ch == 'O' || ch == 'U')
+		return 2;
+	else
+		return 0;
+}
+
+char* changeEven(char* str){
+	char *p = str;
+	while(*p != '\0'){
+		if(isvowel(*p))
+			*p = 'a';
+		else
+			*p = toupper(*p);
+		p++;
+	}
+}
+
+char* changeOdd(char* str){
+	char *p = str;
+	char vocalim[] = ['a', 'e', 'i', 'o', 'u'];
+	char vocaliM[] = ['A', 'E', 'I', 'O', 'U'];
+	int i;
+	while(*p != '\0'){
+		if(*p >= 'A' && *p <= 'Z'){
+			for(i = 0; i < 5; i++)
+				if(*p == vocaliM[i]){
+					*p = vocaliM[(i+1)%5];
+					break;
+				}
+			if(i == 5){
+				if(*p == *(p+1)
+*/			

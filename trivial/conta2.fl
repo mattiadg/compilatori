@@ -1,0 +1,23 @@
+/* Costruire uno scanner che conta il numero di caratteri e il numero di 
+linee di un file dato in input */
+%{
+	int num_lines = 0, num_chars = 0;
+%}
+%option noyywrap
+%%
+
+\n	{ ++num_lines; ++num_chars; }
+.	{ ++num_chars; }
+
+%%
+
+int main(int argc, char* argv[]) {
+	--argc;		/* Non conta il nome del file */
+	if(argc > 0) 
+		yyin = fopen(argv[1], "r");
+	else
+		yyin = stdin;
+	yylex();
+	printf( "# of lines = %d\n# of chars = %d\n", num_lines, num_chars);
+	return 0;
+}

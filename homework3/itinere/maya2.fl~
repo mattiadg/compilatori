@@ -1,0 +1,56 @@
+/* Decodificare un testo maya
+
+Lettere maiuscole singole			->	articoli
+Lettere minuscole singole			->	preposizioni
+parola minuscola inizia vocale		->	sostantivi
+	vocali > consonanti						-> maschile
+	consonanti >= vocali					-> femminile
+numero inizia con 0					->	verbo
+parola minuscola inizia consonante	->	aggettivo
+	vocali n. d. e uguali adiacenti			-> femminile
+	altrimenti								-> maschile
+tutto il resto						->	non riconosciuto
+
+Una riga valida inizia per articolo, possono essere presenti righe non valide
+Stampare un file con una tabella:
+Lessema		Tipo	Genere
+
+e numero di righe valide e non valide
+*/
+
+%{
+	int valide = 0, non_valide = 0; //Numero di righe valide e non valide
+	int vocali = 0, consonanti = 0;
+%}
+
+cons		[b-df-hj-np-tv-z]
+aggfemm		{cons}a*{cons}*e*{cons}*i*{cons}*o*{cons}*u*{cons}*
+
+%x NONV SOSTANTIVO
+%option noyywrap
+%%
+
+^[A-Z]						{ printf("%s\tArticolo\t//\n", yytext); valide++; }
+^([^A-Z].*|[A-Z][^ \t\n]+)	{ BEGIN(NONV); }
+[A-Z]						{ printf("%s\tArticolo\t//\n", yytext); }
+[a-z]						{ printf("%s\tPreposizione\t//\n", yytext); }
+[aeiou]/[a-z]+				{ printf("%c", yytext[0]); BEGIN(SOSTANTIVO); }
+0[0-9]*						{ printf("%s\tVerbo   \t//\n", yytext); }
+{aggfemm}					{ printf("%s\tAggettivo\tf\n", yytext); }
+{cons}[a-z]*				{ printf("%s\tAggettivo\tm\n", yytext); }
+[A-Z][a-zA-Z]+				{ printf("%s\tNR      \t//\n", yytext); }
+.							;
+\n							;
+<SOSTANTIVO>[aeiou]			{ printf("%c", yytext[0]); vocali++; }
+<SOSTANTIVO>{cons}			{ printf("%c", yytext[0]); consonanti++; }
+<SOSTANTIVO>[ \t\n]			{ printf("\tSostantivo\t%c\n", (vocali > consonanti)?'m':'f'); vocali = consonanti = 0; BEGIN(0); }
+<NONV>.						;
+<NONV>\n					{ non_valide++; BEGIN(0); }
+
+%%
+
+int main(void) {
+	yylex();
+	printf("Righe valide: %d\nRighe non valide: %d\n", valide, non_valide);
+	return 0;
+}

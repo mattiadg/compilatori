@@ -1,0 +1,11 @@
+/* Decodifica di agasa */
+
+%option main
+
+vocale		[aeiouAEIOU]
+reverse		{vocale}g{vocale}s{vocale}
+
+%%
+
+{reverse} 	{ printf("%c", yytext[0]); }
+

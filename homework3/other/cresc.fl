@@ -1,0 +1,9 @@
+/*Riconosco e restituisce tutte le stringhe costituite da lettere minuscole in cui tutte le lettere compaiono in ordine alfabetico
+crescente */
+
+%option main
+%%
+
+a?b?c?d?e?f?g?h?i?j?k?l?m?n?o?p?q?r?s?t?u?v?w?x?y?z?	{ ECHO; }
+[a-z]*													;
+

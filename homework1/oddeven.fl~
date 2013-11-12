@@ -1,0 +1,22 @@
+/* Conti le occorrenze dei numeri pari e di quelli dispari */
+%{
+	#include <stdlib.h>
+	int num;	//atoi(yytext)
+	int even = 0, odd = 0;
+%}
+
+pari	[02468]|[1-9][0-9]*[02468]
+dispari [13579]|[1-9][0-9]*[13579]
+
+%option noyywrap
+%%
+
+{nat}	{ num = atoi(yytext); (num % 2 == 0) ? even++:odd++; }
+.		{ ; }
+
+%%
+
+void main() {
+	yylex();
+	printf("num pari = %d\nnum dispari = %d\n", even, odd);
+}

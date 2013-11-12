@@ -1,0 +1,14 @@
+/* tolow.fl
+* Converte tutte le lettere maiuscole di un file in minuscole, ad eccezione di quelle racchiuse tra " e " */
+%{
+	#include <ctype.h>
+%}
+
+maiuscole	[A-Z]
+virgmaius	\"{maiuscole}\"
+%option main
+%%
+
+{maiuscole}	{ printf("%c", tolower(yytext[0])); } 
+{virgmaius}	{ printf("%c", yytext[1]); }
+%%

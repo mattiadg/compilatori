@@ -1,0 +1,22 @@
+/* Contare le occorrenze dei numeri multipli di 3 e multipli di 5 */
+%{
+	#include <stdlib.h>
+	int mul3 = 0, mul5 = 0, num;
+%}
+%option noyywrap
+
+numeri	[1-9][0-9]*
+%%
+
+{numeri}	{num = atoi(yytext);
+		if(num % 3 == 0) mul3++;
+		if(num % 5 == 0) mul5++;}
+[^{numeri}]	;
+
+%%
+
+int main(void) {
+	yylex();
+	printf("Multipli di 3 = %d\nMultipli di 5 = %d\n", mul3, mul5);
+	return 0;
+}

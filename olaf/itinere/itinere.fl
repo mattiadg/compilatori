@@ -1,0 +1,83 @@
+/*Preso in input un file di testo ne produce un altro che risulti di dimensione minore, attuando alcune strategie di compressione lossy
+ad ogni parola del testo (si definisce parola una sequenza di lettere e cifre). In particolare agisce sulle parole che cominciano per consonante
+maiuscola nel seguente modo:
+	Solo lettere maiuscole -> vocali uguali diventano una vocale seguita dal numero di occorrenze
+	Solo iniziale maiuscola -> vocali consecutive crescenti sostituite da prima vocale maiuscola più numero di vocali soppresse
+	Iniziale maiuscola+cifre -> 
+		numero pari -> divisione tra numero e massima potenza di due per cui è divisibile + b + esponente del 2
+	Iniziale maiuscola + lettere e cifre ->
+		cifre consecutive -> somma di tali cifre
+		lettere -> case conversion
+	
+Tutto il resto rimane invariato
+
+Alla fine della scansione stampare numero di sostituzioni per ciascuna tipologia */
+
+%{
+	#include <ctype.h>
+	#include <string.h>
+	int vocmaius = 0, vocminus = 0, numpari = 0, numsum = 0, caseconv = 0;
+	char* convpari(int num);
+	int sommacifre(char* num);
+%}
+
+%x MAIUS MINUS CIFRE MIXED
+
+consvoc			A+|E+|I+|O+|U+
+vocresc			a?e?i?o?u?
+numpari			[0-9]*[02468]
+
+%option noyywrap
+%%
+
+[A-Z]/[A-Z]+					{ ECHO; BEGIN(MAIUS); }
+[A-Z]/[a-z]+					{ ECHO; BEGIN(MINUS); }
+[A-Z]/[0-9]+					{ ECHO; BEGIN(CIFRE); }
+[A-Z]/[a-zA-Z0-9]+				{ ECHO; BEGIN(MIXED); }
+<MAIUS>{consvoc}				{ if(yyleng > 1) {printf("%c%d", yytext[0], yyleng); vocmaius++; } else ECHO; }
+<MAIUS>[ \t\n]					{ ECHO; BEGIN(INITIAL); }
+<MINUS>{vocresc}				{ if(yyleng > 1){ printf("%c%d", toupper(yytext[0]), yyleng); vocminus++; } else ECHO; }
+<MINUS>[ \t\n]					{ ECHO; BEGIN(INITIAL); }
+<CIFRE>{numpari}				{ char* p = convpari(atoi(yytext)); printf("%s", p); free(p); numpari++; }
+<CIFRE>[0-9]+					{ ECHO; }
+<CIFRE>[ \t\n]					{ ECHO; BEGIN(INITIAL); }
+<MIXED>[0-9][0-9]+				{ printf("%d", sommacifre(yytext)); numsum++; }
+<MIXED>[a-z]					{ printf("%c", toupper(yytext[0])); caseconv++; }
+<MIXED>[A-Z]					{ printf("%c", tolower(yytext[0])); caseconv++; }
+<MIXED>[ \t\n]					{ ECHO; BEGIN(INITIAL); }
+
+%%
+
+int main(void){
+	yylex();
+	printf("Numero di sostituzioni effettuate:\n");
+	printf("Vocali maiuscole: %d\n", vocmaius);
+	printf("Vocali minuscole: %d\n", vocminus);
+	printf("Numeri pari: %d\n", numpari);
+	printf("Cifre Adiacenti: %d\n", numsum);
+	printf("Case conversion: %d\n", caseconv);
+}
+
+char* convpari(int num){
+	int mask = 1;
+	int esp = 0;
+	char* res = (char*) malloc(15*sizeof(char));
+	while((mask & num) == 0){
+		num = num >> 1;
+		esp++;
+	}
+	sprintf(res, "%d", num);
+	strcat(res, "b");
+	sprintf(res, "%s%d", res, esp);
+	return res;
+}
+
+int sommacifre(char* num){
+	int res = 0;
+	char *p = num;
+	while(*p != '\0'){
+		res += *p - '0';
+		p++;
+	}
+	return res;
+}

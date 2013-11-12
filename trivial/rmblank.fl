@@ -1,0 +1,13 @@
+/* Programma che comprime tutti gli spazi e i blank in un unico spazio e 
+rimuove quelli alla fine di una riga */
+
+%option main
+
+ws	[ \t]*
+%%
+
+ws	{ printf(" "); }
+ws$	{ }
+/* Alternativamente si può fare 
+ws\n	{ printf("\n") } */
+%%

@@ -1,0 +1,21 @@
+/* Restituisce il più piccolo dei numeri naturali presenti nel testo */
+
+%{
+	#include <stdlib.h>
+	#include <limits.h>
+	uint min = UINT_MAX;
+	int num;	//atoi(yytext)
+%}
+%option noyywrap
+
+nat		0|[1-9][0-9]*
+%%
+
+{nat}	{ num = atoi(yytext); if(num < min) min = num; }
+.		{ }
+%%
+
+void main(){
+	yylex();
+	printf("min = %d\n", min);
+}

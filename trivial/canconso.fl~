@@ -1,0 +1,9 @@
+/* Mantenere solo le linee che finiscono o cominciano con una consonante,
+ cancellando le altre */
+%option main
+
+ncons	[^(b-df-l-np-tvzB-DF-L-NP-TVZ)]
+%%
+
+^{ncons}.*{ncons}$	{ }
+%%

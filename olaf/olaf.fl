@@ -1,0 +1,45 @@
+/*Convertire un testo scritto in italiano nel linguaggio parlato dal cuoco Olaf dei muppets 
+
+a.	La coppia "en" seguita da caratteri non alfabetici viene trasformata in "ee"
+b.	Se una riga termina con ".", "!" o "?" il simbolo viene ripetuto e nella riga successiva viene scritta la frase "Bork! Bork! Bork!"
+c.	Se la lettera "a" (maiuscola o minuscola) è seguita da "n" o "u", la coppia di lettere viene trasformata rispettivamente in "un" e "oo",
+	rispettando le maiuscole. Se invece è seguita da una qualsiasi altra lettera viene trasformata in "e".
+d.	All'interno di una parola, la "e" seguita da caratteri non alfabetici viene trasformata in "e-a", se invece è preceduta da caratteri non
+	alfabetici viene trasformata in "i".
+e.	In ogni parola la prima occorrenza di "i" viene trasformata in "ee", le altre vengono lasciate così come sono.
+f.	Se la "o" è preceduta da caratteri non alfabetici, quest'ultima viene sostituita da "oo", altrimenti la "o" si trasforma in "u".
+g. 	All'interno di una parola la "f" si trasforma in "ff".
+h.	the o The vengono trasformati in zee o Zee
+i.	il th a fine parola viene trasformato in t
+j.	le parole tion, u all'interno di una parola vengono trasformate rispettivamente in scione e oo
+k.	la v viene sempre trasformata in f
+l.	la w sempre in v
+m.	qualsiasi altro carattere viene lasciato inalterato
+*/
+
+%s PRIMAI
+%option main
+%%
+en/[^ \n\ta-zA-Z]		{ printf("ee"); }
+[.?!]$					{ ECHO; ECHO; printf("\nBork! Bork! Bork!\n"); }
+[aA][nN]				{ printf("%c", yytext[0] + 23); ECHO; }
+[aA][uU]				{ printf("%c%c", yytext[0] + 14, yytext[1] + 6); }
+[aA]/[a-zA-Z ]			{ printf("%c", yytext[0] + 4); }
+e/[^ \n\ta-zA-Z]		{ printf("e-a"); }
+[^a-zA-Z]e				{ yytext[yyleng-1] = 'i'; ECHO; }
+<PRIMAI>i				{ ECHO; }
+<PRIMAI>[ \n\t]			{ ECHO; BEGIN(INITIAL); }
+i						{ printf("ee"); BEGIN(PRIMAI); }
+[^a-zA-Z]o				{ ECHO; printf("o"); }
+o						{ printf("u"); }
+[^ \n\t]f/[^ \n\t]		{ ECHO; printf("f"); }
+the						{ printf("zee"); }
+The						{ printf("Zee"); }
+[A-Z]?[a-z]+th			{ yytext[yyleng-1] = '\0'; ECHO; }
+[a-zA-Z]tion[a-zA-Z]	{ printf("scione"); }
+u						{ printf("oo"); }
+v						{ printf("f"); }
+w						{ printf("v"); }
+.						{ ECHO; }
+\n						{ ECHO; }
+%%

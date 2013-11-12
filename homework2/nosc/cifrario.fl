@@ -1,0 +1,11 @@
+/* Genera un sistema di cifratura che converte ciascuna lettera dello
+   alfabeto nel proprio numero corrispondente sommato a 3 */
+
+%option main
+maius	[A-Z]
+minus	[a-z]
+%%
+
+{maius}		{ printf("%d", (int)(yytext[0] - 'A' + 4)); }
+{minus}		{ printf("%d", (int)(yytext[0] - 'a' + 4));	}
+

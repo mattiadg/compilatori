@@ -1,0 +1,88 @@
+/* Linguaggio Abis.
+	Parole chiave: begin, end, do, while, if, then
+	Costanti: numeri interi non negativi
+	Attributo: valore numerico
+	Identificatori: lettera seguita da lettere e numeri
+
+	Tre identificatori con attributi:
+	1) Inizia e finisce per minuscola, tutte le altre lettere maiuscole
+	2) Inizia e finisce per maiuscola, in mezzo solo cifre
+	3) Inizia e finisce per consonante maiuscola, contiene solo lettere
+
+	Attributi corrispondenti:
+	1) Numero di lettere maiuscole
+	2) Massimo numero di zeri consecutivi
+	3) Numero di vocali minuscole
+
+	Se circondato da do...while l'attributo raddoppia
+	
+	Produrre in output una tabella che elenca i token con i lessemi e gli attributi
+*/
+
+%{
+	int riga = 1;						//Conta le righe
+	int zerocons(char* str, int len);		//Restituisce il massimo numero di 0 consecutivi
+	int contaminus(char* str);		//Restituisce il numero di vocali minuscole
+	int mul = 1;
+%}
+
+%option noyywrap
+
+num 		0|[1-9][0-9]*
+id1 		[a-z][A-Z]+[a-z]
+id2			[A-Z][0-9]+[A-Z]
+consmaius	[BCDFGHJKLMNPQRSTVWZ]
+id3			{consmaius}[a-zA-Z]+{consmaius}
+id			[a-zA-Z][a-zA-Z0-9]*
+
+%%
+
+begin		|
+end			|
+if			|
+then		{ printf("Keyword\t\t%s\t\t\t\t%d\n", yytext, riga); }
+do			{ printf("Keyword\t\t%s\t\t\t\t%d\n", yytext, riga); mul = 2; }
+while		{ printf("Keyword\t\t%s\t\t\t\t%d\n", yytext, riga); mul = 1; }
+{num}		{ printf("Const  \t\t%s\t\t%d\t\t%d\n", yytext, atoi(yytext) * mul, riga); }
+{id1}		{ printf("Id_1   \t\t%s\t\t%d\t\t%d\n", yytext, (yyleng - 2) * mul, riga); }
+{id2}		{ printf("Id_2   \t\t%s\t\t%d\t\t%d\n", yytext, zerocons(yytext, yyleng) * mul, riga); }
+{id3}		{ printf("Id_3   \t\t%s\t\t%d\t\t%d\n", yytext, contaminus(yytext) * mul, riga); }
+{id}		{ printf("Id     \t\t%s\t\t%s\t\t%d\n", yytext, "ND", riga); }
+.			;
+\n			{ riga++; }
+
+%%
+
+int main(void){
+	printf("TOKEN  \t\tLESSEMA\t\tATTRIBUTO\tRIGA\n");
+	yylex();
+	printf("\n");
+	return 0;
+}
+
+int zerocons(char* str, int len){
+	int max = 0, conta = 0;
+	int i;
+	for(i = 1; i < len; i++){
+		if(str[i] == '0'){
+			conta++;
+		}
+		else{
+			if(conta > max){
+				max = conta;
+				printf("conta=%d:max=%d\n", conta, max);
+			}
+			conta = 0;
+		}
+	}
+	return conta;
+}
+
+int contaminus(char* str){
+	int conta;
+	int i;
+	for(i = 0; str[i] != '\0'; i++)
+		if(str[i] == 'a' || str[i] == 'e' || str[i] == 'i' || str[i] == 'o' || str[i] == 'u')
+			conta++;
+	return conta;
+}

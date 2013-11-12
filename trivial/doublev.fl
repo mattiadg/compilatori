@@ -1,0 +1,9 @@
+/* Scrivere un programma in Flex che raddoppi tutte le occorrenze delle
+vocali in un file */
+
+%option main
+
+vocali [aeiouAEIOU]
+%%
+{vocali}	{ECHO; ECHO;}
+

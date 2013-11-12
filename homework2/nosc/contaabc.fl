@@ -1,0 +1,19 @@
+/* Conta tutte le parole sull'alfabeto {a, b, c} in cui la prima occorrenza del simbolo 'b' è preceduta da almeno un'occorrenza di 'a' */
+%{
+	int conta = 0;
+%}
+
+%option noyywrap
+
+%%
+
+[ac]*ab[abc]*|[ac]*	{ conta++;}
+[a-zA-Z]*			;
+\n					;
+%%
+
+int main() {
+	yylex();
+	printf("Contate %d occorrenze\n", conta);
+	return 0;
+}

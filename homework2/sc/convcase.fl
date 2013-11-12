@@ -1,0 +1,33 @@
+/* Trasformare in maiuscole tutte le parole delle righe che cominciano con una parola di caratteri tutti minuscoli, in minuscole tutte le 
+parole delle righe che cominciano con una parola di caratteri tutti maiuscoli. Le altre siano lasciate inalterate. */
+
+%s MAIUS MINUS
+%option main 
+
+%{
+	void convmaius(char*);
+	void convminus(char*);
+%}
+%%
+
+^[a-z]+/[ \t]+		|
+^[a-z]+$			{ convmaius(yytext); BEGIN(MAIUS); }
+^[A-Z]+/[ \t]+		|
+^[A-Z]+$			{ convminus(yytext); BEGIN(MINUS); }
+<MAIUS>.			{ printf("%c", toupper(yytext[0])); }
+<MINUS>.			{ printf("%c", tolower(yytext[0])); }
+\n					{ BEGIN(0); ECHO; }
+
+%%
+
+void convmaius(char* str){
+	char *ch;
+	for( ch = str; *ch != '\0'; ch++)
+		printf("%c", toupper(*ch));
+}
+
+void convminus(char* str){
+	char *ch;
+	for( ch = str; *ch != '\0'; ch++)
+		printf("%c", tolower(*ch));
+}

@@ -1,0 +1,11 @@
+/* sample1.fl
+Sample flex file which replaces the 'username' word in a text with the correct username
+*/
+%option noyywrap
+%%
+username	printf("%s", getlogin() );
+%%
+main()
+	{
+	yylex();
+	}

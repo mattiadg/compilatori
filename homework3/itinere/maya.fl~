@@ -1,0 +1,64 @@
+/* Decodificare un testo maya
+
+Lettere maiuscole singole			->	articoli
+Lettere minuscole singole			->	preposizioni
+parola minuscola inizia vocale		->	sostantivi
+	vocali > consonanti						-> maschile
+	consonanti >= vocali					-> femminile
+numero inizia con 0					->	verbo
+parola minuscola inizia consonante	->	aggettivo
+	vocali n. d. e uguali adiacenti			-> femminile
+	altrimenti								-> maschile
+tutto il resto						->	non riconosciuto
+
+Una riga valida inizia per articolo, possono essere presenti righe non valide
+Stampare un file con una tabella:
+Lessema		Tipo	Genere
+
+e numero di righe valide e non valide
+*/
+
+%{
+	int valide = 0, non_valide = 0; //Numero di righe valide e non valide
+	int riga = 1;
+	int vocali = 0, consonanti = 0; //Variabili di lavoro per trovare i sostantivi
+	char last = 'a';			 	//Variabili di lavoro per trovare gli aggettivi
+	int adiac = 0, masch = 0;		//Anche queste
+%}
+
+cons		[b-df-hj-np-tv-z]
+
+%x SOSTANTIVO AGGETTIVOF AGGETTIVOM NONV
+%option noyywrap
+%%
+
+^([a-z0-9]+|[A-Z].+)		{ non_valide++; BEGIN(NONV); }
+^[A-Z]					{ printf("%s\tArticolo\t//\t%d\n", yytext, riga); valide++; }
+[A-Z]					{ printf("%s\tArticolo\t//\t%d\n", yytext, riga); }
+[a-z]					{ printf("%s\tPreposizione\t//\t%d\n", yytext, riga); }
+[aeiou]/[a-z]+			{ printf("%c", yytext[0]); BEGIN(SOSTANTIVO); }
+0[0-9]*					{ printf("%s\tVerbo   \t//\t%d\n", yytext, riga); }
+{cons}/[a-z]+			{ printf("%c", yytext[0]); BEGIN(AGGETTIVOF); }
+[A-Z][a-zA-Z]+			{ printf("%s\tNR      \t//\t%d\n", yytext, riga); }
+[ \t]					;
+\n						{ riga++; }
+<SOSTANTIVO>[aeiou]		{ printf("%c", yytext[0]); vocali++; }
+<SOSTANTIVO>{cons}		{ printf("%c", yytext[0]); consonanti++; }
+<SOSTANTIVO>[ \t]		{ printf("\tSostantivo\t%c\t%d\n", (vocali > consonanti)?'m':'f', riga); vocali = consonanti = 0; BEGIN(0); }
+<SOSTANTIVO>\n			{ printf("\tSostantivo\t%c\t%d\n", (vocali > consonanti)?'m':'f', riga); vocali = consonanti = 0; BEGIN(0); riga++; }
+<AGGETTIVOF>[aeiou]		{ printf("%c", yytext[0]); if(yytext[0] > last){ last = yytext[0]; adiac = 1; } else{ if((last > yytext[0]) || (last == yytext[0] && !adiac)) BEGIN(AGGETTIVOM); last = 'a'; adiac = 0; } }
+<AGGETTIVOF>{cons}		{ printf("%c", yytext[0]); }
+<AGGETTIVOF>[ \t]		{ printf("\tAggettivo\tf\t%d\n", riga); BEGIN(0); }
+<AGGETTIVOF>\n			{ printf("\tAggettivo\tf\t%d\n", riga); riga++; BEGIN(0); }
+<AGGETTIVOM>[a-z]*		{ printf("%s\tAggettivo\tm\t%d\n", yytext, riga); BEGIN(0); }
+<NONV>.					;
+<NONV>\n				{ riga++; BEGIN(0); }
+
+%%
+
+int main(void) {
+	yyout = fopen("output.txt", "w");
+	yylex();
+	printf("Righe valide: %d\nRighe non valide: %d\n", valide, non_valide);
+	return 0;
+}

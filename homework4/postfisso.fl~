@@ -1,0 +1,37 @@
+/* Valuta espressioni in forma postfissa */
+
+numero		[1-9][0-9]*
+operatore	[+*-/]
+
+%x OP1 OP2 OPT
+
+%{
+	int op1, op2;
+	int operazione(char opt);
+%}
+
+%option main
+%%
+
+""					{ BEGIN(OP1); }
+<OP1>{numero}		{ op1 = atoi(yytext); }
+<OP1>[ \t\n]*		{ BEGIN(OP2); }
+<OP1>.				{ printf("Errore! Atteso numero!\n"); exit(1); }
+<OP2>{numero}		{ op2 = atoi(yytext); }
+<OP2>[ \t\n]*		{ BEGIN(OPT); }
+<OP2>.				{ printf("Errore! Atteso numero!\n"); exit(1); }
+<OPT>{operatore}	{ printf("%d", operazione(yytext[0])); }
+<OPT>[ \t\n]*		{ BEGIN(OP2); }
+<OPT>.				{ printf("Errore! Atteso numero!\n"); exit(1); }
+%%
+
+int operazione(char opt){
+	switch(opt){
+		case '+': op1 = op1 + op2; break;
+		case '-': op1 = op1 - op2; break;
+		case '*': op1 = op1 * op2; break;
+		case '/': op1 = op1 / op2; break;
+		default: printf("Errore! Operatore non valido!\n"); exit(1);
+	}
+	return op1;
+}

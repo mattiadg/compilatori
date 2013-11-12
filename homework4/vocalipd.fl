@@ -1,0 +1,64 @@
+/*Se una parola ha un numero pari di vocali, tutte le vocali vengono trasformate in 'a' e tutte le consonanti in maiuscolo.
+Se lo vocali sono in numero dispari, ogni vocale viene trasformata nella successiva, le consonanti doppie dimezzate e le altre in maiuscolo
+*/
+%option main
+%x PARI DISPARI
+
+v			[aeiouAEIOU]
+c			[b-df-hl-np-tv-zB-DF-HL-NP-TV-Z]
+
+%{
+ 	#include <ctype.h>
+	char nextvowel(char);
+	char* doublecon(char* pair);
+%}
+
+%%
+
+""/({c}*{v}{c}*{v}{c}*)*	   		{ BEGIN(PARI); }
+""/{c}*{v}({c}*{v}{c}*{v}{c}*)* 	{ BEGIN(DISPARI); }
+<PARI>{v}							{ printf("a"); }
+<PARI>{c}							{ printf("%c", toupper(yytext[0])); }
+<PARI>[ \t\n]						{ ECHO; BEGIN(INITIAL); }
+<DISPARI>{v}						{ printf("%c", nextvowel(yytext[0])); }
+<DISPARI>{c}{c}						{ printf("%s", doublecon(yytext)); }
+<DISPARI>{c}						{ printf("%c", toupper(yytext[0])); }
+<DISPARI>[ \t\n]					{ ECHO; BEGIN(INITIAL); }
+.									{ ECHO; }
+\n									{ ECHO; }
+
+%%
+
+char nextvowel(char ch){
+	int val;
+	int min = (ch>='a'&&ch<='z')?1:0;
+	char vocm[] = {'a', 'e', 'i', 'o', 'u'};
+	char vocM[] = {'A', 'E', 'I', 'O', 'U'};
+	switch(ch){
+		case 'a': val = 0; break;
+		case 'e': val = 1; break;
+		case 'i': val = 2; break;
+		case 'o': val = 3; break;
+		case 'u': val = 4; break;
+		case 'A': val = 0; break;
+		case 'E': val = 1; break;
+		case 'I': val = 2; break;
+		case 'O': val = 3; break;
+		case 'U': val = 4; break;
+	}
+	if(min)
+		return vocm[(val+1)%5];
+	else
+		return vocM[(val+1)%5];
+}
+
+char* doublecon(char* pair){
+	if(pair[0] == pair[1])
+		pair[1] = '\0';
+	else{
+		pair[0] = toupper(pair[0]);
+		pair[1] = toupper(pair[1]);
+	}
+	return pair;
+}
+			

@@ -1,0 +1,6 @@
+/* ELiminare il testo compreso tra { e } */
+%option main
+%%
+\{[^}]*\}	;
+
+%%
