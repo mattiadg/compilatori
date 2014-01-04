@@ -1,0 +1,22 @@
+%{
+#include "europei.tab.h"
+#include <string.h>
+%}
+
+squadra		[A-Z]+
+allenatore	[a-z_]+
+
+%option noyywrap
+%%
+
+"giornata:"		{ return(DAY); }
+{squadra}		{ yylval.char_t = strdup(yytext); return(SQUADRA); }
+{allenatore}	{ yylval.char_t = strdup(yytext); return(ALL); }
+[0-9]+			{ yylval.val = atoi(yytext); return(NUM); }
+"->"			{ return(ARR); }
+[,;]			{ return(yytext[0]); }
+"$$"			{ return(SEP); }
+[ \n\t]			;
+.				;
+
+%%

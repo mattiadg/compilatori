@@ -1,0 +1,9 @@
+DATA: 15/06/2011;
+RISTORANTE: KALESA;
+CAMERIERI: Pippo;
+
+!!
+
+<CAM>Pippo</CAM>
+<PRI>spaghetti,ravioli,pasta</PRI>
+<!>

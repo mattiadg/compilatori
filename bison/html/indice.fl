@@ -1,0 +1,36 @@
+%{
+#include "indice.tab.h"
+#include <string.h>
+%}
+
+atag			"<"[A-Za-z]+">"
+ctag			"</"[A-Za-z]+">"
+%x COMMENT H
+%option noyywrap
+%%
+
+[ \t\n]								;
+"<"((h|H)(t|T)(m|M)(l|L))">"		{ printf("%s\n", yytext); return(AHTML); }
+"</"(h|H)(t|T)(m|M)(l|L)">"			{ printf("%s\n", yytext); return(CHTML); }
+"<"(h|H)(e|E)(a|A)(d|D)">"			{ printf("%s\n", yytext); return(AHEAD); }
+"</"(h|H)(e|E)(a|A)(d|D)">"			{ printf("%s\n", yytext); return(CHEAD); }
+"<"(b|B)(o|O)(d|D)(y|Y)">"			{ printf("%s\n", yytext); return(ABODY); }
+"</"(b|B)(o|O)(d|D)(y|Y)">"			{ return(CBODY); }
+"<"(t|T)(i|I)(t|T)(l|L)(e|E)">" 	{ printf("%s\n", yytext); return(ATITLE); }
+"</"(t|T)(i|I)(t|T)(l|L)(e|E)">"	{ printf("%s\n", yytext); return(CTITLE); }
+"<"(h|H)1">"						{ printf("%s\n", yytext); BEGIN(H); yylval.int_t = 1; return(AH1); }
+"</"(h|H)1">"						{ printf("%s\n", yytext); return(CH1); }
+"<"(h|H)2">"						{ printf("%s\n", yytext); BEGIN(H); yylval.int_t = 2; return(AH2); }
+"</"(h|H)2">"						{ printf("%s\n", yytext); return(CH2); }
+"<"(h|H)3">"						{ printf("%s\n", yytext); BEGIN(H); yylval.int_t = 3; return(AH3); }
+"</"(h|H)3">"						{ printf("%s\n", yytext); return(CH3); }
+"<"(h|H)4">"						{ printf("%s\n", yytext); BEGIN(H); yylval.int_t = 4; return(AH4); }
+"</"(h|H)4">"						{ printf("%s\n", yytext); return(CH4); }
+{atag}								{ printf("%s\n", yytext); return(ATAG); }
+{ctag}								{ printf("%s\n", yytext); return(CTAG); }
+"<!--"								{ BEGIN(COMMENT); }
+[ A-Za-z0-9_.]+						{ printf("%s\n", yytext); }
+<COMMENT>"-->"						{ BEGIN(INITIAL); }
+<COMMENT>.							;
+<COMMENT>[ \t\n]					;
+<H>[ A-Za-z0-9_]+					{ yylval.stringa = strdup(yytext); printf("%s\n", yytext); BEGIN(INITIAL); return(HTEXT); }

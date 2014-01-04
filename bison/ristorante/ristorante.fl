@@ -1,0 +1,36 @@
+%{
+#include "ristorante.tab.h"
+%}
+
+%option noyywrap
+data			[0-3][0-9][/][01][0-9][/][0-9][0-9][0-9][0-9]
+nrist			[A-Z][A-Z0-9]+
+ncam			[A-Z][a-z]+
+ordine			[a-z]+
+
+%%
+"DATA:"			{ return(DATA); }
+"RISTORANTE:"	{ return(RIST); }
+"CAMERIERI:"	{ return(CAM);	}
+"<CAM>"			{ return(ACAM);	}
+"</CAM>"		{ return(CCAM); }
+"<BAR>"			{ return(ABAR);	}
+"</BAR>"		{ return(CBAR); }
+"<ANT>"			{ return(AANT);	}
+"</ANT>"		{ return(CANT); }
+"<PRI>"			{ return(APRI);	}
+"</PRI>"		{ return(CPRI); }
+"<SEC>"			{ return(ASEC);	}
+"</SEC>"		{ return(CSEC); }
+"<DOL>"			{ return(ADOL);	}
+"</DOL>"		{ return(CDOL); }
+"<!>"			{ return(END);	}
+[;,]			{ return(yytext[0]); }
+"!!"			{ return(SEP);	}
+{data}			{ yylval.stringa = strdup(yytext); return(DAY); }
+{nrist}			{ yylval.stringa = strdup(yytext); return(NRIST); }
+{ncam}			{ yylval.stringa = strdup(yytext); return(NCAM); }
+{ordine}		{ yylval.stringa = strdup(yytext); return(ORD); }
+[ \t\n]			;
+
+%%

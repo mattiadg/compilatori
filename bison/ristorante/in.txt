@@ -1,0 +1,27 @@
+DATA: 15/06/2011;
+RISTORANTE: KALESA;
+CAMERIERI: Pippo, Pluto, Paperino, Minnie;
+
+!!
+
+<CAM>Pippo</CAM>
+<BAR>acqua,birra</BAR>
+<ANT>fritto,cozze,gamberi</ANT>
+<PRI>spaghetti,ravioli</PRI>
+<SEC>spada,tonno</SEC>
+<DOL>gelato,parfait</DOL>
+<!>
+<CAM>Pluto</CAM>
+<BAR>acqua,vino,birra</BAR>
+<ANT>fritto,vongole,gamberi</ANT>
+<PRI>spaghetti,ravioli,pasta</PRI>
+<SEC>spada,tonno,filetto</SEC>
+<DOL>gelato,parfait</DOL>
+<!>
+<CAM>Minnie</CAM>
+<BAR>cocacola,vino,birra</BAR>
+<ANT>vongole,gamberi</ANT>
+<PRI>spaghetti,ravioli,pasta,risotto</PRI>
+<SEC>fiorentina,spiedini,spada,tonno,filetto</SEC>
+<DOL>gelato,parfait,setteveli</DOL>
+<!>

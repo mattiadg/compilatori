@@ -1,0 +1,20 @@
+%{
+#include "beneficenza.tab.h"
+#include <string.h>
+%}
+
+integer 	[1-9][0-9]*|0
+
+%option noyywrap
+%%
+
+"END"			{ return(END);  }
+[A-Z]+			{ yylval.stringa = strdup(yytext); return(DENOM); }
+[A-Z][a-z]+		{ yylval.stringa = strdup(yytext); return(NOME); }
+{integer}		{ yylval.int_val = atoi(yytext); return(NUM);  }
+"->"			{ return(ARR); 	}
+"!!"			{ return(SEP);	}
+[.,;]			{ return(yytext[0]); }
+[ \t\n]			;
+
+%%

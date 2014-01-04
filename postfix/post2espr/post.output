@@ -1,0 +1,162 @@
+Stato 3 1 conflitti shift/riduzione
+
+
+Grammatica
+
+    0 $accept: Input $end
+
+    1 Input: /* vuoto */
+    2      | Input Line
+
+    3 Line: NEWL
+    4     | Post
+
+    5 Post: Expr Expr '*'
+    6     | Expr Expr '+'
+
+    7 Expr: NUM NUM '+'
+    8     | NUM NUM '*'
+    9     | NUM
+
+
+Simboli terminali e regole in cui appaiono
+
+$end (0) 0
+'*' (42) 5 8
+'+' (43) 6 7
+error (256)
+NUM (258) 7 8 9
+NEWL (259) 3
+
+
+Simboli nonterminali e regole in cui appaiono
+
+$accept (7)
+    nel primo membro: 0
+Input (8)
+    nel primo membro: 1 2, nel secondo membro: 0 2
+Line (9)
+    nel primo membro: 3 4, nel secondo membro: 2
+Post (10)
+    nel primo membro: 5 6, nel secondo membro: 4
+Expr (11)
+    nel primo membro: 7 8 9, nel secondo membro: 5 6
+
+
+State 0
+
+    0 $accept: . Input $end
+
+    $default  riduzione con la regola 1 (Input)
+
+    Input  prosecuzione allo stato 1
+
+
+State 1
+
+    0 $accept: Input . $end
+    2 Input: Input . Line
+
+    $end  shift e prosecuzione allo stato 2
+    NUM   shift e prosecuzione allo stato 3
+    NEWL  shift e prosecuzione allo stato 4
+
+    Line  prosecuzione allo stato 5
+    Post  prosecuzione allo stato 6
+    Expr  prosecuzione allo stato 7
+
+
+State 2
+
+    0 $accept: Input $end .
+
+    $default  accetta
+
+
+State 3
+
+    7 Expr: NUM . NUM '+'
+    8     | NUM . NUM '*'
+    9     | NUM .
+
+    NUM  shift e prosecuzione allo stato 8
+
+    NUM       [riduzione con la regola 9 (Expr)]
+    $default  riduzione con la regola 9 (Expr)
+
+
+State 4
+
+    3 Line: NEWL .
+
+    $default  riduzione con la regola 3 (Line)
+
+
+State 5
+
+    2 Input: Input Line .
+
+    $default  riduzione con la regola 2 (Input)
+
+
+State 6
+
+    4 Line: Post .
+
+    $default  riduzione con la regola 4 (Line)
+
+
+State 7
+
+    5 Post: Expr . Expr '*'
+    6     | Expr . Expr '+'
+
+    NUM  shift e prosecuzione allo stato 3
+
+    Expr  prosecuzione allo stato 9
+
+
+State 8
+
+    7 Expr: NUM NUM . '+'
+    8     | NUM NUM . '*'
+
+    '*'  shift e prosecuzione allo stato 10
+    '+'  shift e prosecuzione allo stato 11
+
+
+State 9
+
+    5 Post: Expr Expr . '*'
+    6     | Expr Expr . '+'
+
+    '*'  shift e prosecuzione allo stato 12
+    '+'  shift e prosecuzione allo stato 13
+
+
+State 10
+
+    8 Expr: NUM NUM '*' .
+
+    $default  riduzione con la regola 8 (Expr)
+
+
+State 11
+
+    7 Expr: NUM NUM '+' .
+
+    $default  riduzione con la regola 7 (Expr)
+
+
+State 12
+
+    5 Post: Expr Expr '*' .
+
+    $default  riduzione con la regola 5 (Post)
+
+
+State 13
+
+    6 Post: Expr Expr '+' .
+
+    $default  riduzione con la regola 6 (Post)

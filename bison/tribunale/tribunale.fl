@@ -1,0 +1,23 @@
+%{
+#include "tribunale.tab.h"
+%}
+
+num		0|[1-9][0-9]*
+
+%option noyywrap
+%%
+
+[ \t\n]+						;
+"trib:"							{ return(TRIB); }
+"asta N:"						{ return(ASTA); }
+"immobili:"						{ return(IMMO); }
+"base:"							{ return(BASE); }
+[a-z ]+							{ yylval.str = strdup(yytext); return(CITTA);}
+{num}							{ yylval.int_val = atoi(yytext); return(NUM);  }
+[A-Z_]+							{ yylval.str = strdup(yytext); return(COSE); }
+[A-Z][a-z_]+					{ yylval.str = strdup(yytext); return(NOME); }
+"->"							{ return(ARR);  }
+[,;]							{ return(yytext[0]); }
+"$$"							{ return(SEP);  }
+
+%%
